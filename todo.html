@@ -53,6 +53,30 @@
       transition: 0.3s;
     }
 
+    /* Prevent accidental text cursor on normal UI */
+    button,
+    .task-text,
+    .task-info,
+    .badge,
+    .deadline,
+    .stat,
+    .category,
+    .motivation,
+    .progress-card {
+      user-select: none;
+      cursor: default;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    input,
+    select {
+      cursor: text;
+      user-select: text;
+    }
+
     .container {
       max-width: 900px;
       margin: auto;
@@ -142,7 +166,7 @@
       transition: width 0.4s;
     }
 
-    /* MAIN CARD */
+    /* MAIN */
 
     .todo-card {
       background: var(--card);
@@ -152,7 +176,7 @@
       box-shadow: 0 15px 40px rgba(100, 80, 20, 0.08);
     }
 
-    /* INPUT */
+    /* ADD TASK */
 
     .input-area {
       display: grid;
@@ -186,7 +210,6 @@
       background: var(--yellow);
       color: #302b20;
       font-weight: bold;
-      cursor: pointer;
     }
 
     #addButton:hover {
@@ -221,7 +244,7 @@
       font-size: 13px;
     }
 
-    /* CATEGORIES */
+    /* CATEGORY COUNTERS */
 
     .category-stats {
       display: grid;
@@ -282,7 +305,6 @@
       border-radius: 8px;
       background: transparent;
       color: var(--text);
-      cursor: pointer;
     }
 
     .filter.active {
@@ -350,9 +372,24 @@
       flex-wrap: wrap;
     }
 
-    .task-date {
-      color: var(--muted);
-      font-size: 12px;
+    .badge {
+      font-size: 11px;
+      font-weight: bold;
+      padding: 4px 9px;
+      border-radius: 20px;
+      color: white;
+    }
+
+    .badge-self {
+      background: var(--pink);
+    }
+
+    .badge-work {
+      background: var(--orange);
+    }
+
+    .badge-study {
+      background: var(--blue);
     }
 
     .deadline {
@@ -381,33 +418,71 @@
       color: var(--green);
     }
 
-    .badge {
-      font-size: 11px;
+    /* ACTION BUTTONS */
+
+    .task-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .edit-button,
+    .delete-button {
+      border: none;
+      background: transparent;
+      padding: 8px;
       font-weight: bold;
-      padding: 4px 9px;
-      border-radius: 20px;
-      color: white;
     }
 
-    .badge-self {
-      background: var(--pink);
-    }
-
-    .badge-work {
-      background: var(--orange);
-    }
-
-    .badge-study {
-      background: var(--blue);
+    .edit-button {
+      color: var(--yellow-dark);
     }
 
     .delete-button {
-      background: transparent;
       color: var(--red);
+    }
+
+    .edit-button:hover,
+    .delete-button:hover {
+      text-decoration: underline;
+    }
+
+    /* EDIT FORM */
+
+    .edit-form {
+      display: grid;
+      grid-template-columns: 1fr 140px 130px;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .edit-form input,
+    .edit-form select {
+      padding: 10px;
+    }
+
+    .edit-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 8px;
+    }
+
+    .save-button,
+    .cancel-button {
+      padding: 9px 14px;
+      border-radius: 8px;
       border: none;
-      cursor: pointer;
       font-weight: bold;
-      padding: 8px;
+    }
+
+    .save-button {
+      background: var(--yellow);
+      color: #302b20;
+    }
+
+    .cancel-button {
+      background: var(--border);
+      color: var(--text);
     }
 
     /* EMPTY */
@@ -427,7 +502,7 @@
       font-size: 13px;
     }
 
-    /* RESPONSIVE */
+    /* MOBILE */
 
     @media (max-width: 700px) {
 
@@ -452,9 +527,16 @@
         grid-template-columns: auto 1fr;
       }
 
-      .delete-button {
+      .task-actions {
         grid-column: 2;
-        justify-self: start;
+      }
+
+      .edit-form {
+        grid-template-columns: 1fr;
+      }
+
+      .edit-actions {
+        grid-column: 1;
       }
     }
   </style>
@@ -478,16 +560,16 @@
     </div>
 
 
-    <!-- MOTIVATIONAL MESSAGE -->
+    <!-- MOTIVATION -->
 
     <div class="motivation">
 
       <h2 id="motivationTitle">
-        You've got this! 🌱
+        🌱 Ready when you are!
       </h2>
 
       <p id="motivationText">
-        Start with one small task and build from there.
+        Start with one small task. You don't have to do everything at once.
       </p>
 
     </div>
@@ -498,19 +580,15 @@
     <div class="progress-card">
 
       <div class="progress-top">
-
         <strong>Today's Progress</strong>
 
         <span id="progressText">
           0% complete
         </span>
-
       </div>
 
       <div class="progress-bar">
-
         <div id="progressFill"></div>
-
       </div>
 
     </div>
@@ -519,7 +597,6 @@
     <!-- MAIN -->
 
     <div class="todo-card">
-
 
       <!-- ADD TASK -->
 
@@ -551,7 +628,7 @@
       </div>
 
 
-      <!-- TOTAL / REMAINING / COMPLETED -->
+      <!-- STATS -->
 
       <div class="stats">
 
@@ -573,7 +650,7 @@
       </div>
 
 
-      <!-- CATEGORY TOTALS -->
+      <!-- CATEGORY STATS -->
 
       <div class="category-stats">
 
@@ -663,7 +740,7 @@
       </div>
 
 
-      <!-- TASK LIST -->
+      <!-- TASKS -->
 
       <ul id="taskList"></ul>
 
@@ -827,7 +904,7 @@
     }
 
 
-    /* TOGGLE */
+    /* COMPLETE TASK */
 
     function toggleTask(id) {
 
@@ -914,7 +991,107 @@
     }
 
 
-    /* DATE */
+    /* START EDIT */
+
+    function startEdit(id) {
+
+      const task =
+        tasks.find(
+          task => task.id === id
+        );
+
+      if (!task) {
+        return;
+      }
+
+
+      renderTasks(id);
+
+    }
+
+
+    /* SAVE EDIT */
+
+    function saveEdit(id) {
+
+      const editText =
+        document.getElementById(
+          `edit-text-${id}`
+        );
+
+      const editDate =
+        document.getElementById(
+          `edit-date-${id}`
+        );
+
+      const editCategory =
+        document.getElementById(
+          `edit-category-${id}`
+        );
+
+
+      if (!editText.value.trim()) {
+
+        alert("The task needs a name 🌼");
+
+        return;
+
+      }
+
+
+      if (!editDate.value) {
+
+        alert("Please choose a deadline 📅");
+
+        return;
+
+      }
+
+
+      tasks =
+        tasks.map(task => {
+
+          if (task.id === id) {
+
+            return {
+
+              ...task,
+
+              text:
+                editText.value.trim(),
+
+              date:
+                editDate.value,
+
+              category:
+                editCategory.value
+
+            };
+
+          }
+
+          return task;
+
+        });
+
+
+      saveTasks();
+
+      renderTasks();
+
+    }
+
+
+    /* CANCEL EDIT */
+
+    function cancelEdit() {
+
+      renderTasks();
+
+    }
+
+
+    /* FORMAT DATE */
 
     function formatDate(date) {
 
@@ -933,7 +1110,7 @@
     }
 
 
-    /* DEADLINE STATUS */
+    /* DEADLINE */
 
     function getDeadlineClass(task) {
 
@@ -943,20 +1120,17 @@
 
       }
 
-
       if (task.date < today) {
 
         return "deadline-overdue";
 
       }
 
-
       if (task.date === today) {
 
         return "deadline-today";
 
       }
-
 
       return "deadline-normal";
 
@@ -971,13 +1145,11 @@
 
       }
 
-
       if (task.date < today) {
 
         return "⚠ Overdue";
 
       }
-
 
       if (task.date === today) {
 
@@ -1014,7 +1186,7 @@
 
     /* RENDER */
 
-    function renderTasks() {
+    function renderTasks(editingId = null) {
 
       taskList.innerHTML = "";
 
@@ -1056,8 +1228,6 @@
       }
 
 
-      /* SORT */
-
       filteredTasks.sort(
         (a, b) =>
           a.date.localeCompare(b.date)
@@ -1075,6 +1245,138 @@
         if (task.completed) {
 
           li.classList.add("completed");
+
+        }
+
+
+        /* EDIT MODE */
+
+        if (task.id === editingId) {
+
+          const editForm =
+            document.createElement("div");
+
+          editForm.className =
+            "edit-form";
+
+
+          const editText =
+            document.createElement("input");
+
+          editText.type = "text";
+
+          editText.id =
+            `edit-text-${task.id}`;
+
+          editText.value =
+            task.text;
+
+
+          const editDate =
+            document.createElement("input");
+
+          editDate.type = "date";
+
+          editDate.id =
+            `edit-date-${task.id}`;
+
+          editDate.value =
+            task.date;
+
+
+          const editCategory =
+            document.createElement("select");
+
+          editCategory.id =
+            `edit-category-${task.id}`;
+
+
+          editCategory.innerHTML = `
+
+            <option value="self">🌸 Self</option>
+
+            <option value="work">💼 Work</option>
+
+            <option value="study">📚 Study</option>
+
+          `;
+
+
+          editCategory.value =
+            task.category;
+
+
+          const editActions =
+            document.createElement("div");
+
+          editActions.className =
+            "edit-actions";
+
+
+          const saveButton =
+            document.createElement("button");
+
+          saveButton.className =
+            "save-button";
+
+          saveButton.textContent =
+            "✓ Save";
+
+
+          saveButton.addEventListener(
+            "click",
+            () => saveEdit(task.id)
+          );
+
+
+          const cancelButton =
+            document.createElement("button");
+
+          cancelButton.className =
+            "cancel-button";
+
+          cancelButton.textContent =
+            "Cancel";
+
+
+          cancelButton.addEventListener(
+            "click",
+            cancelEdit
+          );
+
+
+          editActions.appendChild(
+            saveButton
+          );
+
+          editActions.appendChild(
+            cancelButton
+          );
+
+
+          editForm.appendChild(
+            editText
+          );
+
+          editForm.appendChild(
+            editDate
+          );
+
+          editForm.appendChild(
+            editCategory
+          );
+
+          editForm.appendChild(
+            editActions
+          );
+
+
+          li.appendChild(editForm);
+
+          taskList.appendChild(li);
+
+
+          return;
 
         }
 
@@ -1125,8 +1427,6 @@
           "task-info";
 
 
-        /* CATEGORY */
-
         const badge =
           document.createElement("span");
 
@@ -1150,8 +1450,6 @@
           icons[task.category];
 
 
-        /* DEADLINE */
-
         const deadline =
           document.createElement("span");
 
@@ -1167,13 +1465,35 @@
 
         info.appendChild(deadline);
 
-
         content.appendChild(text);
 
         content.appendChild(info);
 
 
-        /* DELETE */
+        /* ACTIONS */
+
+        const actions =
+          document.createElement("div");
+
+        actions.className =
+          "task-actions";
+
+
+        const editButton =
+          document.createElement("button");
+
+        editButton.className =
+          "edit-button";
+
+        editButton.textContent =
+          "Edit";
+
+
+        editButton.addEventListener(
+          "click",
+          () => startEdit(task.id)
+        );
+
 
         const deleteButton =
           document.createElement("button");
@@ -1191,11 +1511,21 @@
         );
 
 
+        actions.appendChild(
+          editButton
+        );
+
+        actions.appendChild(
+          deleteButton
+        );
+
+
         li.appendChild(checkbox);
 
         li.appendChild(content);
 
-        li.appendChild(deleteButton);
+        li.appendChild(actions);
+
 
         taskList.appendChild(li);
 
@@ -1213,20 +1543,18 @@
     }
 
 
-    /* STATS */
+    /* STATISTICS */
 
     function updateStats() {
 
       const total =
         tasks.length;
 
-
       const completed =
         tasks.filter(
           task =>
             task.completed
         ).length;
-
 
       const remaining =
         total - completed;
@@ -1263,8 +1591,6 @@
         ).length;
 
 
-      /* PROGRESS */
-
       const percentage =
         total === 0
           ? 0
@@ -1293,13 +1619,11 @@
       const total =
         tasks.length;
 
-
       const completed =
         tasks.filter(
           task =>
             task.completed
         ).length;
-
 
       const remaining =
         total - completed;
@@ -1488,7 +1812,7 @@
     );
 
 
-    /* START */
+    /* INITIAL */
 
     renderTasks();
 
